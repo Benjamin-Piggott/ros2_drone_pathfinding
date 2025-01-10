@@ -1,0 +1,12 @@
+source;share/ros2_drone_pathfinding/hook/path.ps1
+source;share/ros2_drone_pathfinding/hook/path.dsv
+source;share/ros2_drone_pathfinding/hook/path.sh
+source;share/ros2_drone_pathfinding/hook/pythonpath.ps1
+source;share/ros2_drone_pathfinding/hook/pythonpath.dsv
+source;share/ros2_drone_pathfinding/hook/pythonpath.sh
+source;share/ros2_drone_pathfinding/hook/pythonscriptspath.ps1
+source;share/ros2_drone_pathfinding/hook/pythonscriptspath.dsv
+source;share/ros2_drone_pathfinding/hook/pythonscriptspath.sh
+source;share/ros2_drone_pathfinding/hook/ament_prefix_path.ps1
+source;share/ros2_drone_pathfinding/hook/ament_prefix_path.dsv
+source;share/ros2_drone_pathfinding/hook/ament_prefix_path.sh
