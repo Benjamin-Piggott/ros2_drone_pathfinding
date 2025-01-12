@@ -8,7 +8,7 @@ from rclpy.node import Node
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 from .drone_interfaces.a_star import PathFinder
-from .drone_interfaces.grid_utils import generate_grid_string
+from .drone_interfaces.grid_utils import convert_occupancy_grid, generate_grid_string
 
 class PathfindingServer(Node):
     def __init__(self):
