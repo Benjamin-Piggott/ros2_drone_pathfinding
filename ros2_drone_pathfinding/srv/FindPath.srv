@@ -1,0 +1,13 @@
+# Request
+# Start position in 3D space
+geometry_msgs/Point start
+# Goal position in 3D space
+geometry_msgs/Point goal
+---
+# Response
+# Whether pathfinding was successful
+bool success
+# The calculated path if successful
+nav_msgs/Path path
+# Array of strings containing visualisation data for each step
+string[] visualisation_steps
