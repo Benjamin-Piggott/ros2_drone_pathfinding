@@ -1,4 +1,29 @@
-"""Launch file for testing the complete drone pathfinding system."""
+"""
+Launch Configuration for Drone Pathfinding System
+
+This launch file configures and initialises all necessary nodes for the complete
+drone pathfinding system. It sets up the core pathfinding functionality, sensor
+systems, motor controllers, and visualisation components.
+
+System Components:
+    Core Systems:
+        - Pathfinding server with configurable grid parameters
+        - Position sensing and obstacle detection
+        - Motor control system with individual motor controllers
+        - Visualisation bridge for system monitoring
+
+Configuration Parameters:
+    Pathfinding:
+        - grid_size: 40 (grid dimensions)
+        - cell_size: 0.25 metres (resolution)
+    
+    Obstacle Detection:
+        - update_rate: 10.0 Hz
+        - sensor_range: 5.0 metres
+    
+    Visualisation:
+        - websocket_port: 8765 (monitoring interface)
+"""
 
 from launch import LaunchDescription
 from launch_ros.actions import Node

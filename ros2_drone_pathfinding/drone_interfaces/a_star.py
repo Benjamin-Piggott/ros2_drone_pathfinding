@@ -1,4 +1,24 @@
 # Create at ros2_drone_pathfinding/drone_interfaces/a_star.py
+"""
+A* Pathfinding Implementation for Drone Navigation System
+
+This module implements the A* pathfinding algorithm specifically adapted for drone
+navigation in a grid-based environment. It provides functionality for finding optimal
+paths while avoiding obstacles, converting between world and grid coordinates, and
+generating ROS2-compatible path messages.
+
+Key Features:
+    - A* pathfinding implementation with diagonal movement support
+    - Coordinate conversion between world and grid spaces
+    - ROS2 message type integration
+    - Occupancy grid processing
+    - Path validation and safety checks
+
+Dependencies:
+    - ROS2 geometry_msgs and nav_msgs
+    - Python standard library (math, heapq)
+    - Custom utility modules
+"""
 
 import math
 import heapq
@@ -67,7 +87,23 @@ class PathFinder:
         return path_msg
 
     def find_path(self, start: Point, goal: Point) -> Tuple[Optional[Path], List[str]]:
-        """Find path between start and goal points using A* algorithm."""
+        """
+        Finds the path between the start and goal points using the A* algorithm
+
+        Args:
+            start (Point): The starting point in the world coordinates
+            goal (Point): The destination point in the world coordinates
+
+        Returns:
+            Tuple[Optional[Path], List[str]]:
+                - ROS2 Path message representing the optimal path, or None is no path exists.
+                - A list of strings containing debug or error messages.
+        
+        Algorithm Details:
+            - Converts start and goal world coordinates to grid coordinates.
+            - Uses the A* algorithm to search for the shortest path, with support for diagonal movement.
+            - Handles blocked and out-of-bounds cells.        
+        """
         # Convert world coordinates to grid coordinates
         start_grid = self.world_to_grid(start)
         goal_grid = self.world_to_grid(goal)
@@ -86,7 +122,7 @@ class PathFinder:
         cell_details = [[Cell() for _ in range(self.width)] for _ in range(self.height)]
         
         # Initialise start cell
-        i, j = start_grid
+        i, j = start_grid # i and j represent the row and column indices of the current cell, respectively
         cell_details[i][j].f = 0.0
         cell_details[i][j].g = 0.0
         cell_details[i][j].h = 0.0
@@ -102,13 +138,16 @@ class PathFinder:
 
         found_path = False
         
+        # Main A* loop
         while open_list:
+            # Extract the cell with the lowest f-value
             f, i, j = heapq.heappop(open_list)
-            closed_list[i][j] = True
+            closed_list[i][j] = True # Mark the cell as evaluated
 
+            # Explore the neighbour cells 
             for di, dj in directions:
                 new_i, new_j = i + di, j + dj
-                
+                #Skip invalid or blocked cells and already seen cells
                 if not self.is_valid(new_i, new_j):
                     continue
                 if not self.is_unblocked(new_i, new_j):

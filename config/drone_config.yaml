@@ -1,0 +1,29 @@
+pathfinding_server:
+  ros__parameters:
+    grid_size: 100
+    cell_resolution: 0.1  # metres
+    update_rate: 10.0  # Hz
+    visualisation_enabled: true
+
+obstacle_detection:
+  ros__parameters:
+    sensor_range: 5.0  # metres
+    detection_threshold: 0.7
+    grid_update_rate: 10.0  # Hz
+    confidence_threshold: 0.8
+
+motor_coordinator:
+  ros__parameters:
+    max_speed: 1.0
+    min_speed: 0.1
+    acceleration_limit: 0.5
+    deceleration_limit: 0.7
+    turning_speed_factor: 0.8
+
+visualisation_bridge:
+  ros__parameters:
+    websocket_port: 8765
+    websocket_host: "localhost"
+    update_rate: 30.0  # Hz
+    connection_timeout: 5.0  # seconds
+    reconnect_attempts: 3

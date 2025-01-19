@@ -1,4 +1,23 @@
 # Create at ros2_drone_pathfinding/drone_interfaces/grid_utils.py
+"""
+Grid Utilities Module for Drone Pathfinding System
+
+This module provides utility functions for handling and visualising grid-based environments
+used in drone pathfinding operations. It includes tools for converting between ROS2
+occupancy grids and internal grid representations, as well as functions for generating
+visual representations of the pathfinding process.
+
+The module supports:
+    - Converting ROS2 OccupancyGrid messages to 2D grid arrays
+    - Generating ASCII-based visualisations of the pathfinding environment
+    - Creating grids with path visualisation for debugging and monitoring
+
+Key Features:
+    - Grid format conversion between ROS2 and internal representations
+    - ASCII-based grid visualisation with multiple cell states
+    - Support for visualising open/closed lists during pathfinding
+    - Path visualisation utilities for debugging
+"""
 
 from typing import List, Tuple, Any
 from nav_msgs.msg import OccupancyGrid

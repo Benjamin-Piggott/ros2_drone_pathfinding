@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
 """
-ROS 2 node for drone position sensing.
-Provides position data for A* pathfinding and obstacle detection.
+Drone Position Sensing System
+
+This module implements a ROS 2 node for precise drone position tracking and
+broadcasting. It provides real-time position data essential for pathfinding
+and obstacle detection subsystems.
+
+Key Features:
+    - High-frequency position updates (10Hz)
+    - Best-effort QoS profile for real-time performance
+    - 3D position tracking (x, y, z coordinates)
+    - ROS 2 time synchronisation
+    - Map frame reference system
+
+The system broadcasts position data using the geometry_msgs/PoseStamped message type,
+allowing other nodes to track the drone's location in real-time.
+
+Dependencies:
+    - ROS 2 rclpy
+    - geometry_msgs
+    - rclpy.qos utilities
 """
 
 import rclpy
@@ -12,6 +30,15 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 class PositionSensor(Node):
     def __init__(self):
+        """
+        Initialise the position sensor node with publishers and timer.
+        
+        Sets up:
+            - Position publisher with best-effort QoS profile
+            - 10Hz update timer for position broadcasting
+            - Initial position tracking variables
+        """
+
         super().__init__('position_sensor')
         
         # Create QoS profile for sensor data
@@ -35,7 +62,20 @@ class PositionSensor(Node):
         self.get_logger().info('Position sensor is ready')
         
     def publish_position(self):
-        """Publish current position (simulated for now)."""
+        """
+        Publish the current drone position.
+        
+        Creates and publishes a PoseStamped message containing:
+            - Current timestamp
+            - Map frame reference
+            - 3D position coordinates (x, y, z)
+            
+        Note:
+            This implementation currently simulates position data.
+            In a production environment, this would interface with
+            actual positioning hardware.
+        """
+        
         pose_msg = PoseStamped()
         pose_msg.header.stamp = self.get_clock().now().to_msg()
         pose_msg.header.frame_id = 'map'

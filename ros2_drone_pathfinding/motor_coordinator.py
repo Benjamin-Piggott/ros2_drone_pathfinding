@@ -1,7 +1,24 @@
 """
-ROS 2 node that coordinates motor commands based on the planned path.
-Receives A* pathfinding results from the pathfinding_server and
-converts them into individualised motor commands.
+Motor Coordination System for Drone Navigation
+
+This module implements a ROS 2 node that coordinates individual motor commands
+based on planned navigation paths. It transforms high-level path planning into
+precise motor control instructions for the drone's propulsion system.
+
+Key Features:
+    - Path-to-motor command conversion
+    - Individual motor speed calculation
+    - Differential drive support
+    - Real-time command updates
+    - Four-motor (quadcopter) support
+
+The system receives path data from the A* pathfinding algorithm and converts
+waypoints into appropriate motor commands for smooth navigation.
+
+Dependencies:
+    - ROS 2 rclpy
+    - nav_msgs for path data
+    - std_msgs for motor commands
 """
 
 import rclpy
@@ -12,6 +29,15 @@ import math
 
 class MotorCoordinator(Node):
     def __init__(self):
+        """
+        Initialise the motor coordinator node with publishers and subscribers.
+        
+        Sets up:
+            - Path subscriber for receiving navigation plans
+            - Individual motor command publishers
+            - Motor speed calculation system
+        """
+         
         super().__init__('motor_coordinator')
         
         # Subscribe to planned path from A* algorithm
@@ -31,7 +57,21 @@ class MotorCoordinator(Node):
         self.get_logger().info('Motor coordinator is ready')
 
     def path_callback(self, path_msg):
-        """Convert A* path points to individualised motor commands."""
+        """
+        Process incoming path messages and generate motor commands.
+        
+        Converts sequential path points into appropriate motor commands
+        for smooth navigation between waypoints.
+        
+        Args:
+            path_msg: Navigation path containing sequential waypoints
+                     as PoseStamped messages
+        
+        Note:
+            Processes each path segment separately to ensure precise
+            motor control throughout the navigation sequence.
+        """
+
         if not path_msg.poses:
             return
             
@@ -47,7 +87,21 @@ class MotorCoordinator(Node):
             self.publish_motor_commands(dx, dy)
             
     def publish_motor_commands(self, dx, dy):
-        """Calculate and publish commands for each motor."""
+        """
+        Calculate and distribute individual motor commands.
+        
+        Converts directional movement into appropriate speeds for each
+        motor using differential drive calculations.
+        
+        Args:
+            dx: Desired movement in x-direction (metres)
+            dy: Desired movement in y-direction (metres)
+            
+        Note:
+            Uses a simplified differential drive model. May need adjustment
+            based on specific drone characteristics and requirements.
+        """
+
         # Calculate individualised motor speeds
         fl_speed = Float32()
         fr_speed = Float32()
