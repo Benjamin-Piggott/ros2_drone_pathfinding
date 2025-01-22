@@ -1,1 +1,1 @@
-geometry_msgs:nav_msgs:rclpy:std_msgs
+geometry_msgs:nav_msgs:python3-websockets:rclpy:rosidl_default_runtime:std_msgs:websockets

@@ -12,7 +12,7 @@ import json
 import asyncio
 import time
 from math import atan2, degrees
-from .websocket.websocket_server import WebSocketServer
+from .websocket.websocket_server import EnhancedWebSocketServer
 
 class VisualisationBridge(Node):
     def __init__(self):
@@ -49,7 +49,7 @@ class VisualisationBridge(Node):
         )
         
         # Initialise WebSocket server
-        self.websocket_server = WebSocketServer()
+        self.websocket_server = EnhancedWebSocketServer()
         
         # Create timer for regular updates
         update_rate = self.get_parameter('update_rate').value

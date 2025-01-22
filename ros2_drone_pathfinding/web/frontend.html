@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drone Pathfinding Visualisation</title>
+    <style>
+        #visualieationCanvas {
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+        .status {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">Connection Status: <span id="connectionStatus">Disconnected</span></div>
+    <canvas id="visualisationCanvas" width="800" height="600"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('visualisationCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusElement = document.getElementById('connectionStatus');
+        
+        function connect() {
+            const ws = new WebSocket('ws://localhost:8765');
+            
+            ws.onopen = () => {
+                statusElement.textContent = 'Connected';
+                statusElement.style.color = 'green';
+            };
+            
+            ws.onclose = () => {
+                statusElement.textContent = 'Disconnected';
+                statusElement.style.color = 'red';
+                setTimeout(connect, 1000); // Reconnect after 1 second
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                drawVisualisation(data);
+            };
+        }
+        
+        function drawVisualisation(data) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (data.type === 'drone_status') {
+                // Draw trajectory
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                data.trajectory.forEach((point, index) => {
+                    const x = point.x * 100 + 400; // Scale and center
+                    const y = point.y * 100 + 300;
+                    if (index === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                
+                // Draw current position
+                const currentX = data.current_position.x * 100 + 400;
+                const currentY = data.current_position.y * 100 + 300;
+                ctx.beginPath();
+                ctx.fillStyle = 'red';
+                ctx.arc(currentX, currentY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw planned path if available
+                if (data.planned_path) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'green';
+                    ctx.setLineDash([5, 5]);
+                    data.planned_path.forEach((point, index) => {
+                        const x = point.x * 100 + 400;
+                        const y = point.y * 100 + 300;
+                        if (index === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+        }
+        
+        connect();
+    </script>
+</body>
+</html>
