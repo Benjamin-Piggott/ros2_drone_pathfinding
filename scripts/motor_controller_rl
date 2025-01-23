@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+import ros2_drone_pathfinding.motor_controller_rl
+if __name__ == '__main__':
+    ros2_drone_pathfinding.motor_controller_rl.main()

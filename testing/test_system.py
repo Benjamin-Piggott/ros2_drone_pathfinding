@@ -30,6 +30,11 @@ import asyncio
 import websockets
 import json
 import time
+import coverage
+
+# Initalise coverage
+cov = coverage.Coverage()
+cov.start
 
 class TestNode(Node):
     """Helper node for testing ROS 2 communications."""
@@ -270,6 +275,19 @@ async def test_obstacle_avoidance(pathfinder, obstacle_detection, executor, test
     for pose in path.poses:
         grid_x, grid_y = pathfinder.world_to_grid(pose.pose.position)
         assert latest_grid.data[grid_y * latest_grid.info.width + grid_x] < 50
+
+def pytest_sessionfinish(session):
+    """Generate coverage report after tests complete."""
+    cov.stop()
+    cov.save()
+
+    # Generate HTML report
+    cov.html_report(directory='coverage_report')
+
+    # Print coverage to console
+    total_coverage = cov.report()
+    print(f"\nTotal test coverage: {total_coverage}%")
+
 
 if __name__ == '__main__':
     pytest.main(['-v', __file__])
