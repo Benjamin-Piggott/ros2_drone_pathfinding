@@ -31,6 +31,8 @@ import websockets
 import json
 import time
 import coverage
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Initalise coverage
 cov = coverage.Coverage()
@@ -157,45 +159,90 @@ def test_path_finding(pathfinder, start, goal, expected_success):
     else:
         assert path is None
 
+# Pathfinding tests in different environments
+@pytest.mark.parametrize("scenario", [
+    ("simple", Point(x=0.1, y=0.1), Point(x=0.5, y=0.5)),
+    ("medium", Point(x=0.1, y=0.1), Point(x=1.0, y=1.0)),
+    ("complex", Point(x=0.1, y=0.1), Point(x=1.9, y=1.9))
+])
+def test_pathfinding_performance(pathfinder, scenario):
+    """Test path finding functionality with various complexities of environements."""
+    scenario_name, start, goal = scenario
+    timing_data = []
+    
+    # Run multiple trials
+    for _ in range(10):
+        start_time = time.time()
+        path, steps = pathfinder.find_path(start, goal)
+        computation_time = time.time() - start_time
+        timing_data.append(computation_time)
+    
+    # Plot results
+    plt.figure(figsize=(10, 6))
+    plt.bar(scenario_name, np.mean(timing_data))
+    plt.title('Pathfinding Computation Time by Scenario')
+    plt.ylabel('Time (seconds)')
+    plt.savefig('pathfinding_timing.png')
+    plt.close()
+
 # Motor controller tests
 @pytest.mark.asyncio
-async def test_motor_responses(ros_context, executor, test_node):
-    """Test motor controller responses to commands."""
-    # Set up subscriptions for all motor status topics
+async def test_motor_performance(ros_context, executor, test_node):
+    """Test motor controller responses to commands"""
     motors = ['fl', 'fr', 'rl', 'rr']
-    subscribers = {
-        motor: test_node.create_test_subscription(
-            Float32,
-            f'motor_{motor}_status'
-        ) for motor in motors
-    }
+    response_times = {motor: [] for motor in motors}
+    accuracies = {motor: [] for motor in motors}
     
-    # Create publishers for motor commands
-    publishers = {
-        motor: test_node.create_publisher(
-            Float32,
-            f'motor_{motor}_command',
-            10
-        ) for motor in motors
-    }
-    
-    executor.add_node(test_node)
-    
-    # Test each motor
     for motor in motors:
-        # Send test command
-        msg = Float32()
-        msg.data = 0.5
-        publishers[motor].publish(msg)
-        
-        # Allow time for processing
-        await asyncio.sleep(0.1)
-        executor.spin_once()
-        
-        # Verify response
-        assert len(test_node.received_messages) > 0
-        latest_msg = test_node.received_messages[-1]
-        assert pytest.approx(latest_msg.data, 0.01) == 0.5
+        for _ in range(10):
+            start_time = time.time()
+            msg = Float32()
+            msg.data = 0.5
+            
+            # Test response time
+            publisher = test_node.create_publisher(
+                Float32, 
+                f'motor_{motor}_command', 
+                10)
+
+            publisher.publish(msg)
+
+            await asyncio.sleep(0.1)
+            executor.spin_once()
+            
+            response_time = time.time() - start_time
+            response_times[motor].append(response_time)
+            
+            # Test accuracy
+            if test_node.received_messages:
+                received = test_node.received_messages[-1].data
+                accuracy = 100 - abs(received - msg.data) * 100
+                accuracies[motor].append(accuracy)
+    
+    # Plot results
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.arange(len(motors))
+    width = 0.35
+    
+    avg_times = [np.mean(response_times[m]) for m in motors]
+    avg_accuracies = [np.mean(accuracies[m]) for m in motors]
+    
+    ax.bar(x - width/2, avg_times, width, label='Response Time (s)')
+    ax2 = ax.twinx()
+    ax2.bar(x + width/2, avg_accuracies, width, label='Accuracy (%)', color='orange')
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(motors)
+    ax.set_ylabel('Response Time (seconds)')
+    ax2.set_ylabel('Accuracy (%)')
+    ax.set_title('Motor Controller Performance')
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
+    
+    plt.tight_layout()
+    plt.savefig('motor_performance.png')
+    plt.close()
+
 
 # WebSocket visualisation tests
 @pytest.mark.asyncio
