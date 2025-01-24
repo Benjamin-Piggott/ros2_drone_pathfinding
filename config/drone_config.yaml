@@ -27,3 +27,4 @@ visualisation_bridge:
     update_rate: 30.0  # Hz
     connection_timeout: 5.0  # seconds
     reconnect_attempts: 3
+    
